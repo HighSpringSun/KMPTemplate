@@ -13,36 +13,25 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.dokar.sonner.rememberToasterState
+import com.kmpstudy.di.appModule
+import com.kmpstudy.ui.component.toaster.LocalToasterState
+import com.slapps.cupertino.theme.CupertinoTheme
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 import kmptemplate.composeapp.generated.resources.Res
 import kmptemplate.composeapp.generated.resources.compose_multiplatform
+import org.kodein.di.compose.withDI
 
 @Composable
 @Preview
 fun App() {
-    MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
-        Column(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .safeContentPadding()
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Button(onClick = { showContent = !showContent }) {
-                Text("Click me!")
-            }
-            AnimatedVisibility(showContent) {
-                val greeting = remember { Greeting().greet() }
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-                    Text("Compose: $greeting")
-                }
+    CupertinoTheme {
+        withDI(appModule) {
+            val globalToasterState = rememberToasterState()
+            CompositionLocalProvider(LocalToasterState provides globalToasterState) {
+
             }
         }
     }

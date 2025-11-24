@@ -16,12 +16,17 @@ plugins {
 }
 
 kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+        freeCompilerArgs.add("-opt-in=kotlin.time.ExperimentalTime")
+    }
+
     androidTarget {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
+
     listOf(
         iosArm64(),
         iosSimulatorArm64()
@@ -29,26 +34,32 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
+            freeCompilerArgs += listOf("-Xbinary=bundleId=com.kmpstudy.ComposeApp")
         }
     }
-    
+
     jvm()
-    
+
 //    js {
 //        browser()
 //        binaries.executable()
 //    }
-    
+
 //    @OptIn(ExperimentalWasmDsl::class)
 //    wasmJs {
 //        browser()
 //        binaries.executable()
 //    }
-    
+
     sourceSets {
+        all {
+            languageSettings.optIn("kotlin.experimental.ExperimentalObjCName")
+        }
+
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.ktor.client.okhttp)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -112,6 +123,10 @@ kotlin {
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
+            implementation(libs.ktor.client.java)
+        }
+        iosMain.dependencies {
+            implementation(libs.ktor.client.darwin)
         }
     }
 }
@@ -134,7 +149,8 @@ android {
     }
     buildTypes {
         getByName("release") {
-            isMinifyEnabled = false
+            isMinifyEnabled = true           // ✅ 启用代码混淆（R8）
+            isShrinkResources = true         // ✅ 移除未使用的资源
         }
     }
     compileOptions {
